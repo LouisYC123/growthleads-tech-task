@@ -1,1 +1,1 @@
-# growthleads-tech-task
+# Growthleads Tech Task
