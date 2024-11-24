@@ -163,3 +163,4 @@ cython_debug/
 db-data
 .DS_Store
 data
+dbt/web_traffic/profiles.yml
