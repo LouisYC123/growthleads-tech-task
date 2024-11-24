@@ -162,5 +162,4 @@ cython_debug/
 #.idea/
 db-data
 .DS_Store
-data/landing_zone/*
-data/archive/*
+data
