@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: growthleads 
+    description: Database to hold raw data from various sources
+    schema: bronze 
+    tables: 
+      - name: routy
+        description: web traffic data. Refreshed daily.
+      - name: voluum
+        description: web traffic data. Refreshed daily.
+      - name: manual
+        description: web traffic data. Refreshed daily.
+      - name: deals
+        description: descriptions of comissions calculations. Refreshed daily.
+      - name: voluum_mapper
+        description: Mapping configuration data. Refreshed daily.
+      - name: central_mapping
+        description: Mapping configuration data. Refreshed daily.
