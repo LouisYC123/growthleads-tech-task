@@ -1,6 +1,6 @@
 from growthleads_etl import schemas
 
-# Data sources
+# Transactional data
 WEB_TRAFFIC = {
     "routy": {
         "schema": schemas.RoutyBronzeDataset,
@@ -18,6 +18,7 @@ WEB_TRAFFIC = {
         "load_type": "append",
     },
 }
+# Slowly changing dimensions
 SCD = {
     "deals": {
         "schema": schemas.DealsBronzeDataset,
