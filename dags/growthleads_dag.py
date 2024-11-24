@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 
 from airflow.decorators import dag
-from airflow.utils.task_group import TaskGroup
 
-from growthleads_etl import schemas, tasks
+from growthleads_etl import tasks, config, data_sources
 
 
 # TODO: add a check to ensure pg_conn_id is set in Airflow Connections
@@ -22,22 +21,15 @@ def web_traffic_dag():
     """
     DAG to monitor a folder for a CSV file and load it into a DataFrame.
     """
+    extract_webtraffic = tasks.extract_taskgroup(
+        data_sources.WEB_TRAFFIC, "extract_webtraffic"
+    )
 
-    with TaskGroup(group_id="extract") as extract:
+    extract_scd = tasks.extract_taskgroup(data_sources.SCD, "extract_scd")
 
-        extract_routy = tasks.extract_source(
-            source="routy",
-            schema=schemas.RoutyBronzeDataset,
-        )
-        extract_voluum = tasks.extract_source(
-            source="voluum",
-            schema=schemas.VoluumBronzeDataset,
-        )
+    transform = tasks.transform_taskgroup(config.DBT_CONFIG)
 
-        # Set task dependencies
-        [extract_routy, extract_voluum]
-
-    extract  # Reference the task group
+    [extract_webtraffic, extract_scd] >> transform
 
 
 dag = web_traffic_dag()
