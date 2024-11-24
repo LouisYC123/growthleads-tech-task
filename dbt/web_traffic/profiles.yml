@@ -1,0 +1,12 @@
+dbt_profile:
+  outputs:
+    dev:
+      type: postgres
+      # host: pg_container
+      host: localhost # need to change this back after local dev
+      user: lg_dev
+      password: lg_pswrd
+      port: 5432
+      dbname: growthleads
+      schema: bronze  # Default schema
+  target: dev
