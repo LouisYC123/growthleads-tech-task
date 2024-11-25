@@ -60,11 +60,10 @@ def standardise_column_names(df: pd.DataFrame) -> pd.DataFrame:
 def standardise_dates(df: pd.DataFrame) -> pd.DataFrame:
     if "date" in df.columns:
         df["date"] = pd.to_datetime(
-            df["date"], errors="coerce", infer_datetime_format=True
+            df["date"].str.replace("/", "-", regex=False),
+            errors="coerce",
+            infer_datetime_format=True,
         )
-        df["date"] = df["date"].dt.strftime(
-            "%Y-%m-%d"
-        )  # Standardise to 'YYYY-MM-DD' format
     return df
 
 
