@@ -1,3 +1,11 @@
+{{
+    config(
+        materialized='incremental',  
+        unique_key='source_id'  ,
+        incremental_strategy='delete+insert',   
+    )
+}}
+
 WITH routy AS (
     SELECT * FROM {{ ref('routy_cleaned') }}
 ),
@@ -9,16 +17,25 @@ voluum AS (
 ),
 final as (
 SELECT
-    r.*,
-    v.voluum_brand,
-    v.clicks
+    r.*
+    , v.voluum_brand
+    , COALESCE(v.clicks, 0) as clicks
 FROM 
     routy AS r
-    JOIN voluum_mapper vr
+    LEFT JOIN voluum_mapper vr
         ON r.marketing_source = vr.marketing_source
-    JOIN voluum v 
+    LEFT JOIN voluum v 
         ON vr.voluum_brand = v.voluum_brand
-        -- Note sure about this
-        -- AND r.event_date = v.event_date
+        AND r.filename = v.filename
 )
-SELECT * FROM final
+
+SELECT 
+    *
+FROM 
+    final
+{% if is_incremental() %}
+WHERE source_id NOT IN (
+    SELECT source_id
+    FROM {{ this }}
+)
+{% endif %}
