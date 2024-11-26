@@ -11,6 +11,7 @@ class BaseBronzeSchema(DataFrameModel):
     source: pd.StringDtype = Coerced()
     filename: pd.StringDtype = Coerced()
     ingestion_timestamp: pd.Timestamp = Coerced()
+    event_id: pd.StringDtype = Coerced()
     source_id: pd.StringDtype = Coerced()
 
 
