@@ -1,8 +1,3 @@
-{{ config(
-    materialized='incremental',
-    unique_key='traffic_event_id' 
-) }}
-
 WITH commision_calculated AS (
     SELECT * FROM {{ ref('solution_1') }}
 ),
