@@ -78,6 +78,10 @@ def standardise_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_metadata(df: pd.DataFrame, source: str, filename: str) -> pd.DataFrame:
     """Add metadata columns to the DataFrame."""
+    # source_id for event traffic data
+    combined = df.astype(str).agg("".join, axis=1)
+    df["event_id"] = combined.map(lambda x: hashlib.md5(x.encode()).hexdigest())
+
     return df.assign(
         source=source,
         filename=filename,
