@@ -12,16 +12,6 @@ models:
         description: marketing source name
         tests:
           - not_null
-          - accepted_values:
-              values:
-                - TOP-SPO1
-                - LOW-SPO1
-                - LOW-SPO2
-                - LOW-SPO21
-                - TOP-FR
-                - LOW-FR12
-                - GRAUTO
-                - FRAUTO
       - name: operator
         description: code for the operator
         tests:
@@ -56,6 +46,7 @@ models:
         description: timestamp of the point of ingestion
         tests:
           - not_null
+      - name: event_id
       - name: source_id
         description:  hash of source and filename
         tests:
@@ -101,6 +92,7 @@ models:
         description: timestamp of the point of ingestion
         tests:
           - not_null
+      - name: event_id
       - name: source_id
         description:  hash of source and filename
         tests:
@@ -134,6 +126,7 @@ models:
         description: timestamp of the point of ingestion
         tests:
           - not_null
+      - name: event_id
       - name: source_id
         description:  hash of source and filename
         tests:

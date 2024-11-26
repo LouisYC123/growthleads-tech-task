@@ -42,4 +42,13 @@ FROM
     JOIN deals d ON ms.deal_id = d.deal_id
     JOIN operators o ON te.operator_id = o.operator_id
 )
-SELECT * FROM final
+SELECT 
+    *
+FROM 
+    final
+{% if is_incremental() %}
+WHERE traffic_event_id NOT IN (
+    SELECT traffic_event_id
+    FROM {{ this }}
+)
+{% endif %}
