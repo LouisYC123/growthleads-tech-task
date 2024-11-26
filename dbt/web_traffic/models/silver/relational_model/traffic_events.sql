@@ -29,7 +29,7 @@ traffic_mapped AS (
     -- Map operator to operator_id
     LEFT JOIN {{ ref('operators') }} AS op
             -- not typically advisable, but for this small dataset should be ok
-        ON t.operator = op.variants OR t.operator = op.std_operator
+        ON t.operator = op.variants OR t.operator = op.operator
     -- Map voluum_brand to brand_id
     LEFT JOIN {{ ref('country') }} AS c
         ON t.country_code = c.country_code

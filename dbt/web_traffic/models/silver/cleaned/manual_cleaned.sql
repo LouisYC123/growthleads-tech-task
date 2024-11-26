@@ -20,5 +20,5 @@ SELECT
 FROM 
     manual m
     JOIN central_mapping cm ON m.operator = cm.variants 
-        OR m.operator = cm.std_operator 
+        OR m.operator = cm.operator 
 

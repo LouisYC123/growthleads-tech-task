@@ -3,7 +3,7 @@ WITH cental_mapping AS (
 )
 SELECT 
     variants 
-    , REPLACE(std_operator, 'LOL', ' ') AS std_operator
+    , REPLACE(std_operator, 'LOL', ' ') AS operator
     , country as country_code
     , source
     , filename

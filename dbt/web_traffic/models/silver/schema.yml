@@ -216,7 +216,7 @@ models:
         description: variant name
         tests:
           - not_null
-      - name: std_operator
+      - name: operator
         description: operator name
         tests:
           - not_null
@@ -291,7 +291,7 @@ models:
         tests:
           - not_null
           - unique
-      - name: std_operator 
+      - name: operator 
         tests:
           - not_null
       - name: variants 
