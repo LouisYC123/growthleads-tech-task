@@ -15,9 +15,6 @@ SELECT
     , CURRENT_TIMESTAMP AS load_timestamp
 FROM 
     countries
-WHERE 
-    country_code IS NOT NULL
-
 {% if is_incremental() %}
 WHERE country_code NOT IN (SELECT country_code FROM {{ this }})
 {% endif %}

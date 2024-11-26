@@ -3,8 +3,6 @@
     unique_key='marketing_source_id'
 ) }}
 
-{{ config(materialized='incremental') }}
-
 
 WITH traffic as (
     SELECT * FROM {{ ref('routy_manual_enriched' )}}
