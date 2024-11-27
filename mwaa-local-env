@@ -2,9 +2,26 @@
 
 AIRFLOW_VERSION=2_10
 DOCKER_COMPOSE_PROJECT_NAME=aws-mwaa-local-runner-$AIRFLOW_VERSION
+ENV_FILE=".env"
+
+# Define the target directory for the YAML file and folders relative to the script's location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+YML_OUTPUT_DIR="$SCRIPT_DIR"
+GENERATED_YML="$YML_OUTPUT_DIR/profiles.yml"
+
+# Define paths for the new folders
+DATA_DIR="$SCRIPT_DIR/data"
+LANDING_ZONE_DIR="$DATA_DIR/landing_zone"
+CENTRAL_MAPPING_LAND="$LANDING_ZONE_DIR/central_mapping"
+DEALS_LAND="$LANDING_ZONE_DIR/deals"
+MANUAL_LAND="$LANDING_ZONE_DIR/manual"
+ROUTY_LAND="$LANDING_ZONE_DIR/routy"
+SCRAPERS_LAND="$LANDING_ZONE_DIR/scrapers"
+VOLUUM_LAND="$LANDING_ZONE_DIR/voluum"
+VOLUUM_MAPPER_LAND="$LANDING_ZONE_DIR/voluum_mapper"
+ARCHIVE_ZONE_DIR="$DATA_DIR/archive_zone"
 
 display_help() {
-   # Display Help
    echo "======================================"
    echo "   MWAA Local Runner CLI"
    echo "======================================"
@@ -12,13 +29,15 @@ display_help() {
    echo "Airflow version $AIRFLOW_VERSION"
    echo "---commands---"
    echo "help                   Print CLI help"
-   echo "build-image            Build Image Locally"
+   echo "build-image            Build Image Locally, Generate YML, and Create Directories"
    echo "reset-db               Reset local PostgresDB container."
    echo "start                  Start Airflow local environment. (LocalExecutor, Using postgres DB)"
    echo "test-requirements      Install requirements on an ephemeral instance of the container."
    echo "package-requirements   Download requirements WHL files into plugins folder."
    echo "test-startup-script    Execute shell script on an ephemeral instance of the container."
    echo "validate-prereqs       Validate pre-reqs installed (docker, docker-compose, python3, pip3)"
+   echo "generate-yml           Generate profiles.yml from .env"
+   echo "create-folders         Create dataDEV/landing_zone and dataDEV/archive_zone if they don't exist"
    echo
 }
 
@@ -52,13 +71,94 @@ validate_prereqs() {
    fi
 }
 
+generate_yml() {
+   if [ ! -f "$ENV_FILE" ]; then
+      echo "Error: .env file not found in the current directory."
+      exit 1
+   fi
+
+   echo "Reading environment variables from $ENV_FILE..."
+   export $(grep -v '^#' $ENV_FILE | xargs)
+
+   echo "Generating $GENERATED_YML..."
+   cat > $GENERATED_YML <<EOL
+version: '3.8'
+services:
+  airflow:
+    image: amazon/mwaa-local:${AIRFLOW_VERSION}
+    environment:
+      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW__CORE__FERNET_KEY}
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+      - AIRFLOW__CORE__EXECUTOR=${AIRFLOW__CORE__EXECUTOR}
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./plugins:/usr/local/airflow/plugins
+      - ./logs:/usr/local/airflow/logs
+EOL
+
+   echo "YML file generated at $GENERATED_YML"
+}
+
+create_folders() {
+   echo "Checking and creating directories if they do not exist..."
+
+   # Ensure the data directory exists
+   if [ ! -d "$DATA_DIR" ]; then
+      echo "Creating $DATA_DIR..."
+      mkdir -p "$DATA_DIR"
+   else
+      echo "$DATA_DIR already exists. Skipping creation."
+   fi
+
+   # Ensure the landing_zone directory exists
+   if [ ! -d "$LANDING_ZONE_DIR" ]; then
+      echo "Creating $LANDING_ZONE_DIR..."
+      mkdir -p "$LANDING_ZONE_DIR"
+   else
+      echo "$LANDING_ZONE_DIR already exists. Skipping creation."
+   fi
+
+   # Create subdirectories in landing_zone
+   for SUBDIR in "$CENTRAL_MAPPING_LAND" "$DEALS_LAND" "$MANUAL_LAND" "$ROUTY_LAND" "$SCRAPERS_LAND" "$VOLUUM_LAND" "$VOLUUM_MAPPER_LAND"; do
+      if [ ! -d "$SUBDIR" ]; then
+         echo "Creating $SUBDIR..."
+         mkdir -p "$SUBDIR"
+      else
+         echo "$SUBDIR already exists. Skipping creation."
+      fi
+   done
+
+   # Ensure the archive_zone directory exists
+   if [ ! -d "$ARCHIVE_ZONE_DIR" ]; then
+      echo "Creating $ARCHIVE_ZONE_DIR..."
+      mkdir -p "$ARCHIVE_ZONE_DIR"
+   else
+      echo "$ARCHIVE_ZONE_DIR already exists. Skipping creation."
+   fi
+
+   echo "Directory setup complete."
+}
+
 build_image() {
+   echo "Ensuring directories exist..."
+   create_folders
+
+   echo "Running generate_yml to ensure profiles.yml file is up-to-date..."
+   generate_yml
+
+   echo "Building Docker image..."
    docker build --rm --compress -t amazon/mwaa-local:$AIRFLOW_VERSION ./docker
 }
 
 case "$1" in
 validate-prereqs)
    validate_prereqs
+   ;;
+generate-yml)
+   generate_yml
+   ;;
+create-folders)
+   create_folders
    ;;
 test-requirements)
    BUILT_IMAGE=$(docker images -q amazon/mwaa-local:$AIRFLOW_VERSION)
