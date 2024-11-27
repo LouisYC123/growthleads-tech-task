@@ -16,7 +16,7 @@ services:
 
   pg_db:
     container_name: pg_container
-    image: postgres:13
+    image: postgres:15
     restart: always
     env_file:
       - ./.env

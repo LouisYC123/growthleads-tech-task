@@ -11,9 +11,11 @@ class BaseBronzeSchema(DataFrameModel):
     source: pd.StringDtype = Coerced()
     filename: pd.StringDtype = Coerced()
     ingestion_timestamp: pd.Timestamp = Coerced()
+    event_id: pd.StringDtype = Coerced()
     source_id: pd.StringDtype = Coerced()
 
 
+# Webtraffic schemas
 class RoutyBronzeDataset(BaseBronzeSchema):
     date: pd.Timestamp = Nullable()
     marketing_source: pd.StringDtype = Nullable()
@@ -40,6 +42,17 @@ class ManualBronzeDataset(BaseBronzeSchema):
     signups: pd.Float64Dtype = Nullable()
 
 
+# Scapers schemas
+class ScrapersBronzeDataset(BaseBronzeSchema):
+    date: pd.Timestamp = Nullable()
+    marketing_source: pd.StringDtype = Nullable()
+    operator: pd.StringDtype = Nullable()
+    country: pd.StringDtype = Nullable()
+    total_earnings: pd.Float64Dtype = Nullable()
+    visits: pd.Float64Dtype = Nullable()
+
+
+# SCD schemas
 class DealsBronzeDataset(BaseBronzeSchema):
     marketing_source: pd.StringDtype = Nullable()
     deal: pd.StringDtype = Nullable()

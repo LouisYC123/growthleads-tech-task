@@ -6,5 +6,5 @@ psycopg2-binary
 SQLAlchemy
 pandas
 pandera
-# dbt-postgres
 astronomer-cosmos[dbt-postgres]
+airflow-dbt-python

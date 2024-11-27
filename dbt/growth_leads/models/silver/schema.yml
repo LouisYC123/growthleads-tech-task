@@ -1,0 +1,296 @@
+version: 2
+
+models:
+  - name: routy_cleaned
+    description: table for valid routy data
+    columns:
+      - name: event_time 
+        description: date of the web traffic event
+        tests:
+          - not_null
+      - name: marketing_source
+        description: marketing source name
+        tests:
+          - not_null
+      - name: operator
+        description: code for the operator
+        tests:
+          - not_null
+      - name: country_code
+        description: 2-digit country code
+        tests:
+          - not_null
+      - name: raw_earnings
+        description: amount of earnings 
+        tests:
+          - not_null
+      - name: visits
+        description: number of visits for the marketing source
+        tests:
+          - not_null
+      - name: signups
+        description: number of signups for the marketing source
+        tests:
+          - not_null
+      - name: source
+        description: data souce name
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['routy']
+      - name: filename
+        description: name of the source file
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: timestamp of the point of ingestion
+        tests:
+          - not_null
+      - name: event_id
+      - name: source_id
+        description:  hash of source and filename
+        tests:
+          - not_null
+  - name: manual_cleaned
+    description: table for valid manual data
+    columns:
+      - name: event_time 
+        description: date of the web traffic event.
+        tests:
+          - not_null
+      - name: marketing_source
+        description: marketing source name
+        tests:
+          - not_null
+      - name: operator
+        description: code for the operator
+        tests:
+          - not_null
+      - name: raw_earnings
+        description: amount of earnings 
+        tests:
+          - not_null
+      - name: visits
+        description: number of visits for the marketing source
+        tests:
+          - not_null
+      - name: signups
+        description: number of signups for the marketing source
+        tests:
+          - not_null
+      - name: source
+        description: data souce name
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['manual']
+      - name: filename
+        description: name of the source file
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: timestamp of the point of ingestion
+        tests:
+          - not_null
+      - name: event_id
+      - name: source_id
+        description:  hash of source and filename
+        tests:
+          - not_null
+  - name: voluum_cleaned
+    description: table for valid voluum data
+    columns:
+      - name: event_time 
+        description: date of the web traffic event
+        tests:
+          - not_null
+      - name: voluum_brand
+        description: voluum brand name
+        tests:
+          - not_null
+      - name: clicks 
+        description: number of clicks associated with event
+        tests:
+          - not_null
+      - name: source
+        description: data souce name
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['voluum']
+      - name: filename
+        description: name of the source file
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: timestamp of the point of ingestion
+        tests:
+          - not_null
+      - name: event_id
+      - name: source_id
+        description:  hash of source and filename
+        tests:
+          - not_null
+  - name: deals_cleaned
+    description: table for valid deals data
+    columns:
+      - name: marketing_source
+        description: marketing source name
+        tests:
+          - not_null
+      - name: deal_type
+        description: marketing source name
+        tests:
+          - not_null
+      - name: commision_formula
+        description: formual for calculating commision
+        tests:
+          - not_null
+      - name: add_amount
+        description: |
+          Derived from commision formula. 
+          Amount to be added to the commision
+      - name: has_plus_clicks
+        description: |
+          Boolean flag to indicate if the deal has plus clicks in its formula
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      - name: clicks_multiplier
+        description: amount to multiply clicks by in the commision formula
+      - name: source
+        description: data souce name
+        tests:
+          - not_null
+      - name: filename
+        description: name of the source file
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: timestamp of the point of ingestion
+        tests:
+          - not_null
+      - name: source_id
+        description:  hash of source and filename
+        tests:
+          - not_null
+  - name: voluum_mapper_cleaned
+    description: table for valid voluum_mapper data
+    columns:
+      - name: voluum_brand
+        description: marketing source name
+        tests:
+          - not_null
+      - name: marketing_source
+        description: marketing source name
+        tests:
+          - not_null
+      - name: source
+        description: data souce name
+        tests:
+          - not_null
+      - name: filename
+        description: name of the source file
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: timestamp of the point of ingestion
+        tests:
+          - not_null
+      - name: source_id
+        description:  hash of source and filename
+        tests:
+          - not_null
+  - name: central_mapping_cleaned
+    description: table for valid central_mapping data
+    columns:
+      - name: variants
+        description: variant name
+        tests:
+          - not_null
+      - name: operator
+        description: operator name
+        tests:
+          - not_null
+      - name: country_code
+        description: 2-digit country code
+        tests:
+          - not_null
+      - name: source
+        description: data souce name
+        tests:
+          - not_null
+      - name: filename
+        description: name of the source file
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: timestamp of the point of ingestion
+        tests:
+          - not_null
+      - name: source_id
+        description:  hash of source and filename
+        tests:
+          - not_null
+  - name: deals
+    description: table to store commision data for specific deals
+    columns:
+      - name: deal_id 
+        description: Primary Key
+        tests:
+          - not_null
+          - unique
+      - name: deal_type 
+        tests:
+          - not_null
+      - name: commision_formula 
+        tests:
+          - not_null
+      - name: add_amount 
+        tests:
+          - not_null
+      - name: has_plus_clicks 
+        tests:
+          - not_null
+      - name: clicks_multiplier 
+        tests:
+          - not_null
+  - name: country
+    description: table to store commision data for specific deals
+    columns:
+      - name: country_code 
+        description: Primary Key
+        tests:
+          - not_null
+          - unique
+  - name: marketing_source
+    columns:
+      - name: marketing_source_id 
+        description: Primary Key
+        tests:
+          - not_null
+          - unique
+      - name: marketing_source 
+        tests:
+          - not_null
+      - name: deal_id 
+        tests:
+          - not_null
+  - name: operator
+    columns:
+      - name: operator_id 
+        description: Primary Key
+        tests:
+          - not_null
+          - unique
+      - name: operator 
+        tests:
+          - not_null
+      - name: variants 
+        tests:
+          - not_null
+      - name: country_id 
+        tests:
+          - not_null
+

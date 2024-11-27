@@ -60,11 +60,10 @@ def standardise_column_names(df: pd.DataFrame) -> pd.DataFrame:
 def standardise_dates(df: pd.DataFrame) -> pd.DataFrame:
     if "date" in df.columns:
         df["date"] = pd.to_datetime(
-            df["date"], errors="coerce", infer_datetime_format=True
+            df["date"].str.replace("/", "-", regex=False),
+            errors="coerce",
+            infer_datetime_format=True,
         )
-        df["date"] = df["date"].dt.strftime(
-            "%Y-%m-%d"
-        )  # Standardise to 'YYYY-MM-DD' format
     return df
 
 
@@ -79,6 +78,10 @@ def standardise_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_metadata(df: pd.DataFrame, source: str, filename: str) -> pd.DataFrame:
     """Add metadata columns to the DataFrame."""
+    # source_id for event traffic data
+    combined = df.astype(str).agg("".join, axis=1)
+    df["event_id"] = combined.map(lambda x: hashlib.md5(x.encode()).hexdigest())
+
     return df.assign(
         source=source,
         filename=filename,

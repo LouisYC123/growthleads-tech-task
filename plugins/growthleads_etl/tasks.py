@@ -1,12 +1,14 @@
 import pandas as pd
 
-from growthleads_etl import extract_etl
-from growthleads_etl import config
-
 from airflow.decorators import task
 from airflow.utils.task_group import TaskGroup
 from airflow.sensors.python import PythonSensor
-from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig
+from airflow.operators.dummy import DummyOperator
+from airflow.utils.trigger_rule import TriggerRule
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, RenderConfig
+
+from growthleads_etl import extract_etl
+from growthleads_etl import config
 
 
 @task
@@ -85,27 +87,52 @@ def extract_source(source: str, source_config: str):
     return extract_group
 
 
-def extract_taskgroup(data_sources: dict, group_id: str):
+def extract_taskgroup(group_id: str, data_sources: dict, exclude: list = None):
     """
     Dynamically creates tasks for each data source in the config and adds them to a TaskGroup.
 
     Args:
-        config: A dictionary of data sources.
-        tasks: A module containing reusable task functions.
+        group_id: The ID of the TaskGroup.
+        data_sources: A dictionary of data sources.
+        exclude: A list of sources to exclude.
 
     Returns:
         TaskGroup: The dynamically generated TaskGroup.
     """
+
+    filtered_data_sources = {
+        source: config
+        for source, config in data_sources.items()
+        if exclude is None or source not in exclude
+    }
+
     with TaskGroup(group_id=group_id) as extract:
-        for source_name, source_config in data_sources.items():
+        for source_name, source_config in filtered_data_sources.items():
+            # Create a task group for each source
             source_task_group = extract_source(source_name, source_config)
-            source_task_group
+            if source_config.get("if_missing") == "skip":
+                skip_task = DummyOperator(
+                    task_id=f"{source_name}_optional", trigger_rule=TriggerRule.ALL_DONE
+                )
+                source_task_group >> skip_task
+            else:
+                source_task_group
     return extract
 
 
-def transform_taskgroup(dbt_config: dict):
+def transform_taskgroup(group_id: str, dbt_config: dict, exclude: list = None):
+
+    render_config = RenderConfig(
+        exclude=[
+            f"{source}_{model}"
+            for source in exclude
+            for model in config.DBT_MODEL_TYPES
+        ],
+    )
 
     with DbtTaskGroup(
+        group_id=group_id,
+        render_config=render_config,
         project_config=ProjectConfig(dbt_config["dbt_root_path"]),
         profile_config=ProfileConfig(
             profiles_yml_filepath=dbt_config["dbt_profiles_dir"],
