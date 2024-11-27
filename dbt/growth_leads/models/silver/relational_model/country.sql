@@ -1,7 +1,7 @@
 {{ config(materialized='incremental') }}
 
 WITH routy_voluum AS (
-    SELECT * FROM {{ ref('routy_manual_enriched') }}
+    SELECT * FROM {{ ref('union_enriched') }}
 ),
 countries AS (
     SELECT DISTINCT 

@@ -1,9 +1,10 @@
+-- TODO: dynamically generate the date range based on the min/max dates in table
 WITH RECURSIVE date_range AS (
-    SELECT CAST('2020-01-01' AS DATE) AS calendar_date
+    SELECT CAST('2022-01-01' AS DATE) AS calendar_date
     UNION ALL
     SELECT (calendar_date + INTERVAL '1 day')::DATE
     FROM date_range
-    WHERE calendar_date < '2030-12-31'
+    WHERE calendar_date < '2027-12-31'
 )
 SELECT
     calendar_date,

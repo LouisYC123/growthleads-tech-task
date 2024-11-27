@@ -1,11 +1,11 @@
 {{ config(
-    materialized='custom_table_with_pk',
+    materialized='incremental',
     unique_key='marketing_source_id'
 ) }}
 
 
 WITH traffic as (
-    SELECT * FROM {{ ref('routy_manual_enriched' )}}
+    SELECT * FROM {{ ref('union_enriched' )}}
 ),
 deals_cleaned as (
     SELECT * FROM {{ ref('deals_cleaned' )}}

@@ -4,7 +4,7 @@
 ) }}
 
 WITH traffic AS (
-    SELECT * FROM {{ ref('routy_manual_enriched') }}
+    SELECT * FROM {{ ref('union_enriched') }}
 ),
 marketing_sources AS (
     SELECT * FROM {{ ref('marketing_sources') }}
@@ -19,6 +19,7 @@ traffic_mapped AS (
     -- Map dimensions to their respective IDs
     SELECT
         t.event_time
+        , t.event_date
         , ms.marketing_source_id
         , op.operator_id
         , c.country_id
@@ -26,6 +27,7 @@ traffic_mapped AS (
         , t.visits
         , t.signups
         , t.raw_earnings
+        , t.total_earnings
         , t.source
         , t.filename
         , t.source_id
@@ -54,6 +56,7 @@ SELECT
         ORDER BY d.event_time, d.load_timestamp
         ) AS traffic_event_id -- Generate primary key
     , d.event_time
+    , d.event_date
     , d.marketing_source_id
     , d.operator_id
     , d.country_id
@@ -61,6 +64,7 @@ SELECT
     , d.visits
     , d.signups
     , d.raw_earnings
+    , d.total_earnings
     , d.source_id
     , d.source
     , d.filename
