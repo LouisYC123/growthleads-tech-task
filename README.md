@@ -9,7 +9,7 @@
  git clone https://github.com/LouisYC123/growthleads-tech-task.git
  cd growthleads-tech-task
  ```
-- add the following .env file (in the root of repo)
+- add the following .env file to /docker
     ```
         POSTGRES_USER=<choose_a_username>
         POSTGRES_PASSWORD=<choose_a_password>
