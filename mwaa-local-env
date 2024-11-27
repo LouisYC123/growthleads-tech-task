@@ -2,12 +2,13 @@
 
 AIRFLOW_VERSION=2_10
 DOCKER_COMPOSE_PROJECT_NAME=aws-mwaa-local-runner-$AIRFLOW_VERSION
-ENV_FILE=".env"
+ENV_FILE="$SCRIPT_DIR/docker/.env"
 
 # Define the target directory for the YAML file and folders relative to the script's location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="$SCRIPT_DIR/docker/.env"
 YML_OUTPUT_DIR="$SCRIPT_DIR"
-GENERATED_YML="$YML_OUTPUT_DIR/profiles.yml"
+GENERATED_YML="$YML_OUTPUT_DIR/dbt/growth_leads/profiles.yml"
 
 # Define paths for the new folders
 DATA_DIR="$SCRIPT_DIR/data"
@@ -82,18 +83,18 @@ generate_yml() {
 
    echo "Generating $GENERATED_YML..."
    cat > $GENERATED_YML <<EOL
-version: '3.8'
-services:
-  airflow:
-    image: amazon/mwaa-local:${AIRFLOW_VERSION}
-    environment:
-      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW__CORE__FERNET_KEY}
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
-      - AIRFLOW__CORE__EXECUTOR=${AIRFLOW__CORE__EXECUTOR}
-    volumes:
-      - ./dags:/usr/local/airflow/dags
-      - ./plugins:/usr/local/airflow/plugins
-      - ./logs:/usr/local/airflow/logs
+dbt_profile:
+  outputs:
+    dev:
+      type: postgres
+      host: pg_container
+      user: $POSTGRES_USER
+      password: $POSTGRES_PASSWORD
+      port: 5432
+      dbname: growthleads
+      schema: bronze
+  target: dev
+
 EOL
 
    echo "YML file generated at $GENERATED_YML"
