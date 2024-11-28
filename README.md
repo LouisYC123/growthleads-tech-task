@@ -37,3 +37,6 @@
 
 ## Usage
  - if you want to run dbt outside of airflow, you have to update 'host' in the dbt/profiles.yml to = 'localhost'
+
+## Data Lineage 
+<img width="1708" alt="Data Lineage" src="https://github.com/user-attachments/assets/bd40fbe9-6f31-46fd-9aed-ed98c6f99a00">
