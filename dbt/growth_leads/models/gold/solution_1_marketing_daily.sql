@@ -36,7 +36,7 @@ calc_commision AS (
 final as (
 SELECT 
     marketing_source
-    , event_date
+    , event_date as date
     , SUM(total_commission) as total_commission
 FROM 
     calc_commision
@@ -45,7 +45,7 @@ GROUP BY
 )
 SELECT 
     marketing_source
-    , event_date
+    , date
     , CASE 
         WHEN total_commission < 0 THEN 0
         ELSE total_commission
