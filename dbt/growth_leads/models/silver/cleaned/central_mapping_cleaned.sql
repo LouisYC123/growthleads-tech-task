@@ -1,3 +1,10 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key='source_id',
+        incremental_strategy='delete+insert',
+    )
+}}
 WITH cental_mapping AS (
     SELECT * FROM {{ source('bronze', 'central_mapping' )}}
 )

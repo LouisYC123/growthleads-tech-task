@@ -26,7 +26,7 @@
     connection_id: postgres_conn_id
     host: pg_container
     database: growthleads
-    user:  <the username you chose in the above .env file>
+    login:  <the username you chose in the above .env file>
     password: <the password you chose in the above .env file>
     port: 5432
     ```

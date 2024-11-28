@@ -6,9 +6,19 @@
     )
 }}
 
+-- Explicitly declare dependencies to ensure dbt understands them
+-- depends_on: {{ source('bronze', 'manual') }}
+-- depends_on: {{ ref('central_mapping_cleaned') }}
+
 {% if does_table_exist('bronze', 'manual') %}
 WITH manual AS (
-    SELECT * FROM {{ source('bronze', 'manual') }}
+    SELECT 
+        *
+    FROM (
+        SELECT *, MAX(ingestion_timestamp) OVER () AS max_ingestion_timestamp
+        FROM {{ source('bronze', 'manual') }}
+    ) subquery
+    WHERE ingestion_timestamp = max_ingestion_timestamp
 ),
 central_mapping AS (
     SELECT * FROM {{ ref('central_mapping_cleaned') }}

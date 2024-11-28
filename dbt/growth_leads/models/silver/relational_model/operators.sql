@@ -1,3 +1,10 @@
+{{ config(
+    materialized='incremental',
+    unique_key='source_id',
+    incremental_strategy='delete+insert',
+) }}
+
+
 WITH operators AS (
     SELECT * FROM {{ ref('central_mapping_cleaned') }}
 ),
@@ -9,6 +16,7 @@ operators_distinct AS (
         operator
         , variants
         , country_code
+        , source_id
     FROM operators
 )
 
@@ -17,11 +25,8 @@ SELECT
     , od.operator
     , od.variants
     , c.country_id
+    , od.source_id
     , CURRENT_TIMESTAMP load_timestamp
 FROM 
     operators_distinct od
     LEFT JOIN country c ON od.country_code = c.country_code
-
-{% if is_incremental() %}
-WHERE operator NOT IN (SELECT operator FROM {{ this }})
-{% endif %}

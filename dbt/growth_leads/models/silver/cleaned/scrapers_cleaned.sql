@@ -6,9 +6,14 @@
     )
 }}
 
-
 WITH scrapers AS (
-    SELECT * FROM {{ source('bronze', 'scrapers' )}}
+    SELECT 
+        *
+    FROM (
+        SELECT *, MAX(ingestion_timestamp) OVER () AS max_ingestion_timestamp
+        FROM {{ source('bronze', 'scrapers') }}
+    ) subquery
+    WHERE ingestion_timestamp = max_ingestion_timestamp
 ),
 final AS (
 SELECT 

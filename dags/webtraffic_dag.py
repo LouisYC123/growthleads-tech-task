@@ -8,7 +8,7 @@ from growthleads_etl import tasks, config, data_sources
 # TODO: add a check to ensure pg_conn_id is set in Airflow Connections
 
 DATA_TYPE = "web_traffic"
-EXCLUDE_DATA_SOURCES = ["scrapers"]
+EXCLUDE_DATA_SOURCES = ["scrapers", "manual", "voluum", "routy"]
 
 
 @dag(

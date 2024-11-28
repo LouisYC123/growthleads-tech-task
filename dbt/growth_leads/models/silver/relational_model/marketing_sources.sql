@@ -3,48 +3,26 @@
     unique_key='marketing_source_id'
 ) }}
 
-
-WITH traffic as (
-    SELECT * FROM {{ ref('union_enriched' )}}
+WITH traffic AS (
+    SELECT DISTINCT marketing_source FROM {{ ref('union_enriched') }}
 ),
-deals_cleaned as (
-    SELECT * FROM {{ ref('deals_cleaned' )}}
+deals_cleaned AS (
+    SELECT * FROM {{ ref('deals_cleaned') }}
 ),
-deals as (
-    SELECT * FROM {{ ref('deals' )}}
-),
-marketing_sources_distinct AS (
-    SELECT DISTINCT
-        marketing_source
-    FROM 
-        traffic
-),
-marketing_deals_distinct AS (
-    SELECT DISTINCT
-        marketing_source
-        , deal_type
-    FROM 
-        deals_cleaned
-),
-final as (
+final AS (
     SELECT 
-        ms.marketing_source
-        , COALESCE(d.deal_type, 'FIXED 0') as deal_type
+        ROW_NUMBER() OVER (ORDER BY d.marketing_source) AS marketing_source_id
+        , ms.marketing_source
+        , COALESCE(d.deal_type, 'FIXED 0') AS deal_type
+        , commision_formula
+        , add_amount
+        , has_plus_clicks
+        , clicks_multiplier
         , CURRENT_TIMESTAMP AS load_timestamp
     FROM 
-        marketing_sources_distinct AS ms
-        LEFT JOIN marketing_deals_distinct AS d
+        traffic AS ms
+        LEFT JOIN deals_cleaned AS d
         ON ms.marketing_source = d.marketing_source
 )
-SELECT
-    ROW_NUMBER() OVER (ORDER BY f.marketing_source) AS marketing_source_id -- Generate primary key
-    , f.marketing_source
-    , d.deal_id
-    , CURRENT_TIMESTAMP AS load_timestamp
-FROM 
-    final AS f
-    LEFT JOIN deals d ON f.deal_type = d.deal_type
 
-{% if is_incremental() %}
-WHERE marketing_source NOT IN (SELECT marketing_source FROM {{ this }})
-{% endif %}
+SELECT * FROM final
