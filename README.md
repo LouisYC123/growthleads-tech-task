@@ -40,3 +40,6 @@
 
 ## Data Lineage 
 <img width="1708" alt="Data Lineage" src="https://github.com/user-attachments/assets/bd40fbe9-6f31-46fd-9aed-ed98c6f99a00">
+
+## Relational Model
+![relational_model](https://github.com/user-attachments/assets/b342d332-10ae-49f4-831f-6b885d68b366)
