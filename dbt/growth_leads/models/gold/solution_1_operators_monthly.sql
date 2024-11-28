@@ -54,7 +54,8 @@ calc_commission_with_month AS (
         calc_commission cc
         JOIN calendar cal
             ON cc.event_date = cal.calendar_date
-)
+),
+final as (
 SELECT 
     operator
     , month
@@ -65,3 +66,13 @@ GROUP BY
     1,2
 ORDER BY 
     1,2
+)
+SELECT 
+    operator
+    , month
+    , CASE 
+        WHEN total_commission < 0 THEN 0
+        ELSE total_commission
+    END AS total_commission
+FROM 
+    final

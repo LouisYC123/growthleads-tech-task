@@ -165,3 +165,5 @@ db-data
 data
 profiles.yml
 devscript.sql
+devscript copy.sql
+drop_schemas.sql

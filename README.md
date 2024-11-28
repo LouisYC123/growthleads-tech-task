@@ -33,3 +33,7 @@
 
 ## Usage
  - You can add or configure data sources in ```plugins/growthleads_etl/data_sources```
+
+
+## Usage
+ - if you want to run dbt outside of airflow, you have to update 'host' in the dbt/profiles.yml to = 'localhost'

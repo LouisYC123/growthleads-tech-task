@@ -32,12 +32,23 @@ calc_commision AS (
             ON te.marketing_source_id = ms.marketing_source_id
     WHERE 
         te.source <> 'scrapers'
-)
+), 
+final as (
 SELECT 
     marketing_source
     , event_date
-    , SUM(total_commission)
+    , SUM(total_commission) as total_commission
 FROM 
     calc_commision
 GROUP BY
     1, 2
+)
+SELECT 
+    marketing_source
+    , event_date
+    , CASE 
+        WHEN total_commission < 0 THEN 0
+        ELSE total_commission
+    END AS total_commission
+FROM 
+    final
