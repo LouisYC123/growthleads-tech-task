@@ -1,4 +1,8 @@
-{{ config(materialized='incremental') }}
+{{ config(
+    materialized='incremental',
+    unique_key='country_code',
+    incremental_strategy='delete+insert',
+) }}
 
 WITH routy_voluum AS (
     SELECT * FROM {{ ref('union_enriched') }}
@@ -15,6 +19,3 @@ SELECT
     , CURRENT_TIMESTAMP AS load_timestamp
 FROM 
     countries
-{% if is_incremental() %}
-WHERE country_code NOT IN (SELECT country_code FROM {{ this }})
-{% endif %}

@@ -1,3 +1,11 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key='source_id',
+        incremental_strategy='delete+insert',
+    )
+}}
+
 WITH deals AS (
     SELECT * FROM {{ source('bronze', 'deals' )}}
 )

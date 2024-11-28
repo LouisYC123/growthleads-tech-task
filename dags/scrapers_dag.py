@@ -10,11 +10,10 @@ EXCLUDE_DATA_SOURCES = ["routy", "manual"]
 
 
 @dag(
-    schedule_interval=None,
-    # ! Uncomment below lines for prod
-    # schedule_interval="@daily",
-    # start_date=datetime(2024, 1, 1),
-    # catchup=False,
+    dag_id="scrapers_dag",
+    schedule_interval="@daily",
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
     default_args={
         "retries": 1,
         "retry_delay": timedelta(minutes=5),

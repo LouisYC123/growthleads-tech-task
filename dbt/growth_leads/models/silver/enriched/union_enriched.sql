@@ -8,6 +8,7 @@
 
 -- Explicitly declare dependencies to ensure dbt understands them
 -- depends_on: {{ ref('routy_cleaned') }}
+-- depends_on: {{ ref('voluum_cleaned') }}
 -- depends_on: {{ ref('manual_cleaned') }}
 -- depends_on: {{ ref('scrapers_cleaned') }}
 

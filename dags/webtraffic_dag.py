@@ -5,18 +5,15 @@ from airflow.operators.python import PythonOperator
 
 from growthleads_etl import tasks, config, data_sources
 
-# TODO: add a check to ensure pg_conn_id is set in Airflow Connections
-
 DATA_TYPE = "web_traffic"
-EXCLUDE_DATA_SOURCES = ["scrapers"]
+EXCLUDE_DATA_SOURCES = ["scrapers", "manual", "voluum", "routy"]
 
 
 @dag(
-    schedule_interval=None,
-    # ! Uncomment below lines for prod
-    # schedule_interval="@daily",
-    # start_date=datetime(2024, 1, 1),
-    # catchup=False,
+    dag_id="web_traffic_dag",
+    schedule_interval="@daily",
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
     default_args={
         "retries": 1,
         "retry_delay": timedelta(minutes=5),

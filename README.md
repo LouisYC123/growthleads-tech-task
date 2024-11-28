@@ -9,7 +9,7 @@
  git clone https://github.com/LouisYC123/growthleads-tech-task.git
  cd growthleads-tech-task
  ```
-- add the following .env file (in the root of repo)
+- add the following .env file to /docker
     ```
         POSTGRES_USER=<choose_a_username>
         POSTGRES_PASSWORD=<choose_a_password>
@@ -26,10 +26,14 @@
     connection_id: postgres_conn_id
     host: pg_container
     database: growthleads
-    user:  <the username you chose in the above .env file>
+    login:  <the username you chose in the above .env file>
     password: <the password you chose in the above .env file>
     port: 5432
     ```
 
 ## Usage
  - You can add or configure data sources in ```plugins/growthleads_etl/data_sources```
+
+
+## Usage
+ - if you want to run dbt outside of airflow, you have to update 'host' in the dbt/profiles.yml to = 'localhost'

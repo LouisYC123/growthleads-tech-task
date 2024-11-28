@@ -6,9 +6,14 @@
     )
 }}
 
-
 WITH voluum AS (
-    SELECT * FROM {{ source('bronze', 'voluum' )}}
+    SELECT 
+        *
+    FROM (
+        SELECT *, MAX(ingestion_timestamp) OVER () AS max_ingestion_timestamp
+        FROM {{ source('bronze', 'voluum') }}
+    ) subquery
+    WHERE ingestion_timestamp = max_ingestion_timestamp
 ),
 final AS (
 SELECT 
