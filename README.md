@@ -52,6 +52,7 @@
 - Data quality is managed using dbt tests, and configured in the schema.yml (see notes section below regarding data quality and unit testing)  
 
 Example dag:  
+<img width="1702" alt="airflow_dag_diagram" src="https://github.com/user-attachments/assets/91e79648-941c-4240-92a9-f65cb0db90e6">
 
 
 ## Notes on assignment tasks  
@@ -73,7 +74,8 @@ Example dag:
 
 
 ## Data Lineage 
-<img width="1708" alt="Data Lineage" src="https://github.com/user-attachments/assets/bd40fbe9-6f31-46fd-9aed-ed98c6f99a00">
+<img width="1708" alt="data lineage" src="https://github.com/user-attachments/assets/d553a2a6-6bdc-4567-8aa4-2445434e85b4">
+
 
 ## Relational Model
 ![relational_model](https://github.com/user-attachments/assets/b342d332-10ae-49f4-831f-6b885d68b366)
