@@ -4,25 +4,25 @@ from growthleads_etl import schemas
 EVENTS = {
     "routy": {
         "schema": schemas.RoutyBronzeDataset,
-        "archive": False,
+        "archive": True,
         "load_type": "append",
         "if_missing": "fail",
     },
     "voluum": {
         "schema": schemas.VoluumBronzeDataset,
-        "archive": False,
+        "archive": True,
         "load_type": "append",
         "if_missing": "fail",
     },
     "manual": {
         "schema": schemas.ManualBronzeDataset,
-        "archive": False,
+        "archive": True,
         "load_type": "append",
         "if_missing": "skip",
     },
     "scrapers": {
         "schema": schemas.ScrapersBronzeDataset,
-        "archive": False,
+        "archive": True,
         "load_type": "append",
         "if_missing": "fail",
     },

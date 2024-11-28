@@ -6,7 +6,7 @@ from airflow.operators.python import PythonOperator
 from growthleads_etl import tasks, config, data_sources
 
 DATA_TYPE = "web_traffic"
-EXCLUDE_DATA_SOURCES = ["scrapers", "manual", "voluum", "routy"]
+EXCLUDE_DATA_SOURCES = ["scrapers"]
 
 
 @dag(

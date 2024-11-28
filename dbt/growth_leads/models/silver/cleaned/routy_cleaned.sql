@@ -6,6 +6,8 @@
     )
 }}
 {% if does_table_exist('bronze', 'routy') %}
+-- depends_on: {{ source('bronze', 'routy') }}
+
 WITH routy AS (
     SELECT 
         *
