@@ -56,4 +56,4 @@ def combine_results_dag():
     [wait_for_web_traffic, wait_for_scrapers] >> combine_results
 
 
-dag_c_instance = combine_results_dag()
+dag = combine_results_dag()
