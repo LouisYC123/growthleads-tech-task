@@ -14,7 +14,6 @@
         POSTGRES_USER=<choose_a_username>
         POSTGRES_PASSWORD=<choose_a_password>
         PGADMIN_LISTEN_PORT=5050  
-        DATA_DIR=<directory_to_host_data_landing_zone>
     ```
 - build the image for the AWS MWAA local env by running:  
     ```./mwaa-local-env build-image```
@@ -32,6 +31,8 @@
     password: <the password you chose in the above .env file>
     port: 5432
     ```
+- pip install dbt-core, then `cd dbt/growth_leads` and run `dbt deps`  
+    - Note: This last step is a temporary workaround as I couldnt get airflow to automatically run dbt deps
 
 ## Usage
 - The pipeline assumes an architecture that has a data landing zone (such as an S3 bucket in a production environment) and an external process that dumps data in that landing zone each day.
