@@ -17,7 +17,7 @@ EXCLUDE_DATA_SOURCES = ["routy", "manual"]
     is_paused_upon_creation=False,
     default_args={
         "retries": 5,
-        "retry_delay": timedelta(minutes=5),
+        "retry_delay": timedelta(seconds=3),
     },
 )
 def scrapers_dag():

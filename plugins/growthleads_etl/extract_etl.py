@@ -132,7 +132,7 @@ def load_dataframe_to_postgres(
         schema=schema_name,
         if_exists=if_exists,
         index=False,
-        # method="multi",  # Use multiple-row inserts for efficiency
-        # chunksize=1000,  # Batch size for inserts
+        method="multi",  # Use multiple-row inserts for efficiency
+        chunksize=1000,  # Batch size for inserts
     )
     print(f"Data successfully loaded into '{schema_name}.{table_name}'.")

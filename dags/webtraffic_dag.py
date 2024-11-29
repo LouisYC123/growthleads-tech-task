@@ -7,9 +7,6 @@ from growthleads_etl import tasks, config, data_sources
 DATA_TYPE = "web_traffic"
 EXCLUDE_DATA_SOURCES = [
     "scrapers",
-    "manual",
-    "voluum",
-    "routy",
 ]
 
 
@@ -21,7 +18,7 @@ EXCLUDE_DATA_SOURCES = [
     is_paused_upon_creation=False,
     default_args={
         "retries": 5,
-        "retry_delay": timedelta(minutes=5),
+        "retry_delay": timedelta(seconds=3),
     },
 )
 def web_traffic_dag():
