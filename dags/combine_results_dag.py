@@ -12,9 +12,10 @@ from growthleads_etl import config
     schedule_interval="@daily",
     start_date=datetime(2024, 1, 1),
     catchup=False,
+    is_paused_upon_creation=False,
     default_args={
         "depends_on_past": False,
-        "retries": 1,
+        "retries": 5,
         "retry_delay": timedelta(minutes=5),
     },
 )

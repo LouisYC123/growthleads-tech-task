@@ -1,12 +1,16 @@
 from datetime import datetime, timedelta
 
 from airflow.decorators import dag
-from airflow.operators.python import PythonOperator
 
 from growthleads_etl import tasks, config, data_sources
 
 DATA_TYPE = "web_traffic"
-EXCLUDE_DATA_SOURCES = ["scrapers"]
+EXCLUDE_DATA_SOURCES = [
+    "scrapers",
+    "manual",
+    "voluum",
+    "routy",
+]
 
 
 @dag(
@@ -14,8 +18,9 @@ EXCLUDE_DATA_SOURCES = ["scrapers"]
     schedule_interval="@daily",
     start_date=datetime(2024, 1, 1),
     catchup=False,
+    is_paused_upon_creation=False,
     default_args={
-        "retries": 1,
+        "retries": 5,
         "retry_delay": timedelta(minutes=5),
     },
 )

@@ -14,8 +14,9 @@ EXCLUDE_DATA_SOURCES = ["routy", "manual"]
     schedule_interval="@daily",
     start_date=datetime(2024, 1, 1),
     catchup=False,
+    is_paused_upon_creation=False,
     default_args={
-        "retries": 1,
+        "retries": 5,
         "retry_delay": timedelta(minutes=5),
     },
 )
