@@ -63,7 +63,7 @@ services:
       - "${PWD}/requirements:/usr/local/airflow/requirements"
       - "${PWD}/startup_script:/usr/local/airflow/startup"
       - "${PWD}/dbt:/usr/local/airflow/dbt"
-      - "$DATA_DIR:/opt/airflow/data"
+      - "${PWD}/data:/opt/airflow/data"
       - "${PWD}/logs:/usr/local/airflow/logs"
       
     ports:
