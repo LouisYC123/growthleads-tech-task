@@ -21,6 +21,7 @@ SCRAPERS_LAND="$LANDING_ZONE_DIR/scrapers"
 VOLUUM_LAND="$LANDING_ZONE_DIR/voluum"
 VOLUUM_MAPPER_LAND="$LANDING_ZONE_DIR/voluum_mapper"
 ARCHIVE_ZONE_DIR="$DATA_DIR/archive_zone"
+LOGS_DIR="$SCRIPT_DIR/logs"
 
 display_help() {
    echo "======================================"
@@ -35,7 +36,6 @@ display_help() {
    echo "start                  Start Airflow local environment. (LocalExecutor, Using postgres DB)"
    echo "test-requirements      Install requirements on an ephemeral instance of the container."
    echo "package-requirements   Download requirements WHL files into plugins folder."
-   echo "test-startup-script    Execute shell script on an ephemeral instance of the container."
    echo "validate-prereqs       Validate pre-reqs installed (docker, docker-compose, python3, pip3)"
    echo "generate-yml           Generate profiles.yml from .env"
    echo "create-folders         Create dataDEV/landing_zone and dataDEV/archive_zone if they don't exist"
@@ -111,6 +111,14 @@ create_folders() {
       echo "$DATA_DIR already exists. Skipping creation."
    fi
 
+   # Ensure the logs directory exists
+   if [ ! -d "$LOGS_DIR" ]; then
+      echo "Creating $LOGS_DIR..."
+      mkdir -p "$LOGS_DIR"
+   else
+      echo "$LOGS_DIR already exists. Skipping creation."
+   fi
+
    # Ensure the landing_zone directory exists
    if [ ! -d "$LANDING_ZONE_DIR" ]; then
       echo "Creating $LANDING_ZONE_DIR..."
@@ -170,16 +178,6 @@ test-requirements)
      build_image
    fi
    docker run -v $(pwd)/dags:/usr/local/airflow/dags -v $(pwd)/plugins:/usr/local/airflow/plugins -v $(pwd)/requirements:/usr/local/airflow/requirements -it amazon/mwaa-local:$AIRFLOW_VERSION test-requirements
-   ;;
-test-startup-script)
-   BUILT_IMAGE=$(docker images -q amazon/mwaa-local:$AIRFLOW_VERSION)
-   if [[ -n "$BUILT_IMAGE" ]]; then
-      echo "Container amazon/mwaa-local:$AIRFLOW_VERSION exists. Skipping build"
-   else
-      echo "Container amazon/mwaa-local:$AIRFLOW_VERSION not built. Building locally."
-      build_image
-   fi
-   docker run -v $(pwd)/startup_script:/usr/local/airflow/startup -it amazon/mwaa-local:$AIRFLOW_VERSION test-startup-script
    ;;
 package-requirements)
    BUILT_IMAGE=$(docker images -q amazon/mwaa-local:$AIRFLOW_VERSION)
