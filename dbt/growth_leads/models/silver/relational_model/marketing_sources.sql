@@ -11,7 +11,7 @@ deals_cleaned AS (
 ),
 final AS (
     SELECT 
-        ROW_NUMBER() OVER (ORDER BY d.marketing_source) AS marketing_source_id
+        MD5(ms.marketing_source) AS marketing_source_id
         , ms.marketing_source
         , COALESCE(d.deal_type, 'FIXED 0') AS deal_type
         , commision_formula

@@ -10,8 +10,7 @@ ARCHIVE_ZONE = DATA_DIR / "archive_zone"
 # Airflow Variables & Settings
 POSTGRES_CONN_ID = "postgres_conn_id"
 LANDING_POKE_INTERVAL = 5  # Check landing zone for data every 5 seconds
-LANDING_TIMEOUT = 60  # Stop checking landing zone for data after 60 seconds
-# LANDING_TIMEOUT = 21600  # Stop checking landing zone for data after 6 hours
+LANDING_TIMEOUT = 21600  # Stop checking landing zone for data after 6 hours
 
 # Data types
 SCHEMA_NAMES = Literal["bronze", "silver", "gold"]

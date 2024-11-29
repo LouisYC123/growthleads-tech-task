@@ -11,10 +11,11 @@ countries AS (
     SELECT DISTINCT 
         country_code
     FROM routy_voluum
+    WHERE country_code IS NOT NULL
 )
 
 SELECT
-    ROW_NUMBER() OVER (ORDER BY country_code) AS country_id -- PRIMARY KEY
+    MD5(country_code) AS country_id
     , country_code
     , CURRENT_TIMESTAMP AS load_timestamp
 FROM 
