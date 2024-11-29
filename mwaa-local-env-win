@@ -1,0 +1,168 @@
+# Ensure the script runs in PowerShell
+param (
+    [string]$Command
+)
+
+# Constants
+$AIRFLOW_VERSION = "2_10"
+$DOCKER_COMPOSE_PROJECT_NAME = "aws-mwaa-local-runner-$AIRFLOW_VERSION"
+$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$ENV_FILE = Join-Path $SCRIPT_DIR "docker\.env"
+$YML_OUTPUT_DIR = Join-Path $SCRIPT_DIR "dbt\growth_leads"
+$GENERATED_YML = Join-Path $YML_OUTPUT_DIR "profiles.yml"
+
+# Define paths for directories
+$DATA_DIR = Join-Path $SCRIPT_DIR "data"
+$LANDING_ZONE_DIR = Join-Path $DATA_DIR "landing_zone"
+$SUBDIRS = @(
+    "central_mapping",
+    "deals",
+    "manual",
+    "routy",
+    "scrapers",
+    "voluum",
+    "voluum_mapper"
+)
+$ARCHIVE_ZONE_DIR = Join-Path $DATA_DIR "archive_zone"
+$LOGS_DIR = Join-Path $SCRIPT_DIR "logs"
+
+function Display-Help {
+    Write-Host "======================================"
+    Write-Host "   MWAA Local Runner CLI"
+    Write-Host "======================================"
+    Write-Host "Syntax: .\script.ps1 -Command [command]"
+    Write-Host "Airflow version $AIRFLOW_VERSION"
+    Write-Host "---commands---"
+    Write-Host "help                   Print CLI help"
+    Write-Host "build-image            Build Image Locally, Generate YML, and Create Directories"
+    Write-Host "reset-db               Reset local PostgresDB container."
+    Write-Host "start                  Start Airflow local environment."
+    Write-Host "test-requirements      Install requirements on an ephemeral instance of the container."
+    Write-Host "package-requirements   Download requirements WHL files into plugins folder."
+    Write-Host "validate-prereqs       Validate pre-reqs installed (Docker, Docker Compose, Python3, Pip3)"
+    Write-Host "generate-yml           Generate profiles.yml from .env"
+    Write-Host "create-folders         Create data and logs directories if they don't exist"
+    Write-Host
+}
+
+function Validate-Prereqs {
+    # Validate Docker
+    if (-not (Get-Command "docker" -ErrorAction SilentlyContinue)) {
+        Write-Host "'docker' is not installed or not in PATH." -ForegroundColor Red
+    } else {
+        Write-Host "Docker is installed." -ForegroundColor Green
+    }
+
+    # Validate Docker Compose
+    if (-not (Get-Command "docker-compose" -ErrorAction SilentlyContinue)) {
+        Write-Host "'docker-compose' is not installed or not in PATH." -ForegroundColor Red
+    } else {
+        Write-Host "Docker Compose is installed." -ForegroundColor Green
+    }
+
+    # Validate Python3
+    if (-not (Get-Command "python" -ErrorAction SilentlyContinue)) {
+        Write-Host "Python3 is not installed." -ForegroundColor Red
+    } else {
+        Write-Host "Python3 is installed." -ForegroundColor Green
+    }
+
+    # Validate Pip3
+    if (-not (Get-Command "pip" -ErrorAction SilentlyContinue)) {
+        Write-Host "Pip3 is not installed." -ForegroundColor Red
+    } else {
+        Write-Host "Pip3 is installed." -ForegroundColor Green
+    }
+}
+
+function Generate-YML {
+    if (-not (Test-Path $ENV_FILE)) {
+        Write-Host "Error: .env file not found at $ENV_FILE" -ForegroundColor Red
+        return
+    }
+
+    # Load environment variables from .env
+    $envVars = Get-Content $ENV_FILE | Where-Object { -not ($_.StartsWith("#")) } | ForEach-Object {
+        $_ -split "="
+    } | ForEach-Object {
+        Set-Variable -Name $_[0] -Value $_[1]
+    }
+
+    # Generate profiles.yml
+    $YMLContent = @"
+dbt_profile:
+  outputs:
+    dev:
+      type: postgres
+      host: pg_container
+      user: $env:POSTGRES_USER
+      password: $env:POSTGRES_PASSWORD
+      port: 5432
+      dbname: growthleads
+      schema: bronze
+  target: dev
+"@
+
+    # Write to profiles.yml
+    New-Item -ItemType Directory -Force -Path (Split-Path $GENERATED_YML)
+    $YMLContent | Out-File -Encoding UTF8 $GENERATED_YML
+    Write-Host "YML file generated at $GENERATED_YML"
+}
+
+function Create-Folders {
+    # Create main folders
+    $folders = @($DATA_DIR, $ARCHIVE_ZONE_DIR, $LOGS_DIR, $LANDING_ZONE_DIR)
+    foreach ($folder in $folders) {
+        if (-not (Test-Path $folder)) {
+            New-Item -ItemType Directory -Path $folder -Force
+            Write-Host "Created $folder"
+        } else {
+            Write-Host "$folder already exists. Skipping creation."
+        }
+    }
+
+    # Create landing_zone subdirectories
+    foreach ($subdir in $SUBDIRS) {
+        $path = Join-Path $LANDING_ZONE_DIR $subdir
+        if (-not (Test-Path $path)) {
+            New-Item -ItemType Directory -Path $path -Force
+            Write-Host "Created $path"
+        } else {
+            Write-Host "$path already exists. Skipping creation."
+        }
+    }
+}
+
+function Build-Image {
+    Write-Host "Ensuring directories exist..."
+    Create-Folders
+
+    Write-Host "Generating profiles.yml..."
+    Generate-YML
+
+    Write-Host "Building Docker image..."
+    docker build --rm --compress -t amazon/mwaa-local:$AIRFLOW_VERSION ./docker
+}
+
+function Start {
+    docker-compose -p $DOCKER_COMPOSE_PROJECT_NAME -f ./docker/docker-compose-local.yml up
+}
+
+function Reset-DB {
+    docker-compose -p $DOCKER_COMPOSE_PROJECT_NAME -f ./docker/docker-compose-resetdb.yml up --abort-on-container-exit
+}
+
+# Main script logic
+switch ($Command) {
+    "validate-prereqs" { Validate-Prereqs }
+    "generate-yml" { Generate-YML }
+    "create-folders" { Create-Folders }
+    "build-image" { Build-Image }
+    "reset-db" { Reset-DB }
+    "start" { Start }
+    "help" { Display-Help }
+    default {
+        Write-Host "Invalid command. Use 'help' for usage instructions."
+        Display-Help
+    }
+}
