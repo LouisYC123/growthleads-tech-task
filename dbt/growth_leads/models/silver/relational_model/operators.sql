@@ -21,7 +21,7 @@ operators_distinct AS (
 )
 
 SELECT
-    ROW_NUMBER() OVER (ORDER BY od.operator) AS operator_id
+    MD5(operator) AS operator_id
     , od.operator
     , od.variants
     , c.country_id
