@@ -3,6 +3,8 @@ WITH traffic_events AS (
         * 
     FROM 
         {{ ref('traffic_events') }}
+    WHERE 
+        operator_id IS NOT NULL
 ),
 operators AS (
     SELECT 
@@ -28,7 +30,7 @@ calc_commission AS (
         , te.raw_earnings
         , te.total_earnings
         , CASE 
-            WHEN ms.deal_type = 'default' THEN te.raw_earnings
+            WHEN ms.deal_type = 'FIXED 0' THEN te.raw_earnings
             WHEN ms.has_plus_clicks THEN 
                 COALESCE(te.raw_earnings, 0) 
                 + COALESCE(ms.add_amount, 0) 
@@ -76,3 +78,5 @@ SELECT
     END AS total_commission
 FROM 
     final
+ORDER BY 
+    1,2

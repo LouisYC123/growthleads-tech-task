@@ -44,9 +44,9 @@ SELECT
     , COALESCE(v.clicks, 0) as clicks
 FROM 
     unioned AS m
-    JOIN voluum_mapper vr
+    LEFT JOIN voluum_mapper vr
         ON m.marketing_source = vr.marketing_source
-    JOIN voluum v 
+    LEFT JOIN voluum v 
         ON vr.voluum_brand = v.voluum_brand
         AND m.event_time = v.event_time
 )

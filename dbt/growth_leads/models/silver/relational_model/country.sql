@@ -11,6 +11,7 @@ countries AS (
     SELECT DISTINCT 
         country_code
     FROM routy_voluum
+    WHERE country_code IS NOT NULL
 )
 
 SELECT
