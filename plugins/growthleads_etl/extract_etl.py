@@ -101,7 +101,7 @@ def read_data(source: str, data_dir: Path):
     if not all_files:
         raise FileNotFoundError(f"No CSV files found in {source_path}")
 
-    return pd.concat(
+    df = pd.concat(
         [
             pd.read_csv(file)
             .pipe(standardise_dataframe)
@@ -110,6 +110,8 @@ def read_data(source: str, data_dir: Path):
         ],
         ignore_index=True,
     )
+    print(f"Read {str(df.shape[0])} rows for '{source}")
+    return df
 
 
 # db_tools
@@ -130,7 +132,7 @@ def load_dataframe_to_postgres(
         schema=schema_name,
         if_exists=if_exists,
         index=False,
-        method="multi",  # Use multiple-row inserts for efficiency
-        chunksize=1000,  # Batch size for inserts
+        # method="multi",  # Use multiple-row inserts for efficiency
+        # chunksize=1000,  # Batch size for inserts
     )
     print(f"Data successfully loaded into '{schema_name}.{table_name}'.")
