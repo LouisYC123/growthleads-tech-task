@@ -15,7 +15,7 @@
         POSTGRES_PASSWORD=<choose_a_password>
         PGADMIN_LISTEN_PORT=5050  
     ```
-- build the image for the AWS MWAA local env by running (if on mac, the mwaa-loal-env-win version will hopefully work for windows):  
+- build the image for the AWS MWAA local env by running (or mwaa-loal-env-win if running on windows):  
     ```./mwaa-local-env build-image```
 - Building the image will take a few minutes. When it is done, start the MWAA local runner:  
     ```./mwaa-local-env start```
