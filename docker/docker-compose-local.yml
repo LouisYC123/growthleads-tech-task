@@ -64,6 +64,7 @@ services:
       - "${PWD}/startup_script:/usr/local/airflow/startup"
       - "${PWD}/dbt:/usr/local/airflow/dbt"
       - "$DATA_DIR:/opt/airflow/data"
+      - "${PWD}/logs:/usr/local/airflow/logs"
       
     ports:
       - "8080:8080"
