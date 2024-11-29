@@ -104,7 +104,6 @@ SQL:
 - avoidance of same source + filename is enforced by assigning a source_id and using dbt's 'delete+insert' incremental strategy  
 
 ## Notes
- - Occasionally the extract.load_to_db tasks fail for unknown reasons, but always pass on the 2nd retry.  
  - Due to the nature of the sampled data, and joins on `event_time`, it appears that solution 2 totals are always zero.  
  - if you want to run dbt outside of airflow, you have to update 'host' in the dbt/profiles.yml to = 'localhost'.  
  - Postgres schemas (bronze, silver and gold) are created via a startup script in `docker/db-init-scripts`.  
