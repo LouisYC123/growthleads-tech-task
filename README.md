@@ -49,6 +49,9 @@
         - (the 'manual' data source is currently configure in this way)
 - Once the data is loaded to the database, dbt transforms the data using sql
     - a medallion architecture (bronze, silver, gold) is followed, otherwise known as sources, staging, marts, with the gold (marts) layer being the presentation layer accessed by stakeholders.
+- The evvent data in the landing zone is then moved to the archive_zone.  
+    - Only event data is archived, the Slowly Changing Dimension data is not.  
+        - This can be configured in the data_sources.py module. 
 - Data quality is managed using dbt tests, and configured in the schema.yml (see notes section below regarding data quality and unit testing)  
 
 Example dag:  
@@ -61,12 +64,18 @@ Example dag:
 - The results are saved in data marts (views) prefixed with ```solution_1_```
 
 #### Part 1B
-- To recalculate commisions from new data, just add the corrected data to the landing zone and trigger the dag
+- To recalculate commisions from corrected data, add 'manual' and 'voluum' to EXCLUDE_DATA_SOURCES in webtraffic_dag.py and add the corrected data to the landing zone and trigger the dag.  
 - dbt's incremental strategy ```delete+insert``` will handle the updating of data in the database using the `source_id` (hash of filename and source) as the unique key.
 - recalculated results will appear in the gold layer data mart
 - this is true for both the `routy` events data and any slowly changing dimension data (such as `deals.csv`)
+- logs are saved in `logs/`  
+- to add recalculated `deals` data, add `routy` to EXCLUDE_DATA_SOURCES to exclude all events data and then replace `deals.csv` in the landing_zone with the corrected data. (Only 'routy' needs to be added to the EXCLUDE_DATA_SOURCES list as SCD's are refreshed on every run anyway)
+
+**Note:** For the data from the 27th, the pipeline will wait 6 hours for the manual data. You can either change this in `plugins/growthleads_etl/config.py` or manually mark the `wait_for_manual_csv` task as failed in the UI during the pipeline run.  
+
 #### Part 2
 - The `scrapers_dag` follows the same general workflow, except it's `EXCLUDE_DATA_SOURCES` is configured to only process the `scrapers` and `voluum` data sets.
+- add both scrapers and voluum data to the landing_zone
 - results are saved in data marts prefixed with ```solution_2_```
 #### Part 3
 - The `combine_results_dag` has dependencies on the above two dags, and triggers two dbt models.
@@ -81,7 +90,31 @@ Example dag:
 ![relational_model](https://github.com/user-attachments/assets/b342d332-10ae-49f4-831f-6b885d68b366)
 
 
+## Data Quality management
+The following data quality is enforced:  
+Python:  
+    - dates are cleaned and standardised
+SQL:  
+- NULLs in dates are replaced with date from filename, assigned to 00:00:00
+    - as the lowest granularity we are interested in is daily counts, it was assumed that NULLs could be replaced with filename date + midnight times
+- NULL checks are peformed by dbt and configured in `silver/schema.yml`
+- Accepted value checks are peformed by dbt and configured in `silver/schema.yml`
+- Unique value checks (for dimensional tables) are peformed by dbt and configured in `silver/schema.yml`
+- avoidance of same source + filename is enforced by assigning a source_id and using dbt's 'delete+insert' incremental strategy  
+
 ## Notes
+ - Occasionally the extract.load_to_db tasks fail for unknown reasons, but always pass on the 2nd retry.  
  - Due to the nature of the sampled data, and joins on `event_time`, it appears that solution 2 totals are always zero.  
- - if you want to run dbt outside of airflow, you have to update 'host' in the dbt/profiles.yml to = 'localhost'
- - Postgres schemas (bronze, silver and gold) are created via a startup script in `docker/db-init-scripts`
+ - if you want to run dbt outside of airflow, you have to update 'host' in the dbt/profiles.yml to = 'localhost'.  
+ - Postgres schemas (bronze, silver and gold) are created via a startup script in `docker/db-init-scripts`.  
+
+## Future Development
+With some more development, I would concentrate on the following features:  
+- Rows that fail data quality checks to be sent to seperate table for review (plus notifications / alerts of failures)
+    - This can be done with the Great Expectations library although I think dbt has its own built-in solution for this
+- CICD enforced via:
+    - branch protection requiring at least one peer review
+    - pre-commit hooks to ensure standardisation of code formatting
+    - running pytest to perform tests on functions in growthleads_etl module
+    - (dbt now also has unit test funcitonality - seperate from its current data tests )
+    - All of this managed by GitActions upon push
