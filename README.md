@@ -50,7 +50,7 @@
         - (the 'manual' data source is currently configure in this way)
 - Once the data is loaded to the database, dbt transforms the data using sql
     - a medallion architecture (bronze, silver, gold) is followed, otherwise known as sources, staging, marts, with the gold (marts) layer being the presentation layer accessed by stakeholders.
-- The evvent data in the landing zone is then moved to the archive_zone.  
+- The event data in the landing zone is then moved to the archive_zone.  
     - Only event data is archived, the Slowly Changing Dimension data is not.  
         - This can be configured in the data_sources.py module. 
 - Data quality is managed using dbt tests, and configured in the schema.yml (see notes section below regarding data quality and unit testing)  
